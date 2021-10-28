@@ -23,8 +23,6 @@ namespace PacketsPars
             FileName = fileName;
         }
 
-        public IPars Parser;
-
         public void Open(string FileName)
         {
             // Create the offline device
@@ -38,6 +36,7 @@ namespace PacketsPars
                                     1000))                                  // read timeout
             {
                 // Read and dispatch packets until EOF is reached
+                IoC.Registration(Container);
                 communicator.ReceivePackets(0, DispatcherHandler);
             }
 
@@ -49,22 +48,19 @@ namespace PacketsPars
 
         private void DispatcherHandler(PcapDotNet.Packets.Packet packet)
         {
-            /*ChooseParser(new EthernetPars());
-            this.Parser.Pars(packet);
-            ChooseParser(new TCPPars());
-            this.Parser.Pars(packet);
-            ChooseParser(new UDPPars());
-            this.Parser.Pars(packet);*/
-            ChooseParser(new ICMPPars());
-            this.Parser.Pars(packet);
-            ChooseParser(new HTTPPars());
-            this.Parser.Pars(packet);
+            var instance = Container.GetInstance<IPars>("Ethernet");
+            /*instance.Pars(packet);
+            instance = Container.GetInstance<IPars>("UDP");
+            instance.Pars(packet);
+            instance = Container.GetInstance<IPars>("TCP");
+            instance.Pars(packet);*/
+            instance = Container.GetInstance<IPars>("ICMP");
+            instance.Pars(packet);
+            instance = Container.GetInstance<IPars>("HTTP");
+            instance.Pars(packet);
         }
 
-        private void ChooseParser(IPars parser)
-        {
-            this.Parser = parser;
-        }
+        private LightInject.ServiceContainer Container = new LightInject.ServiceContainer();
 
         private string FileName;
     }
@@ -139,4 +135,15 @@ namespace PacketsPars
         }
     }
 
+    class IoC
+    {
+        public static void Registration(LightInject.ServiceContainer container)
+        {
+            //container.Register<IPars, EthenetPars>("Ethernet");
+            //container.Register<IPars, TCPPars>("TCP");
+            container.Register<IPars, ICMPPars>("ICMP");
+            //container.Register<IPars, UDPPars>("UDP");
+            container.Register<IPars, HTTPPars>("HTTP");
+        }
+    }
 }
