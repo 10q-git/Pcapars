@@ -1,6 +1,6 @@
 ﻿namespace PCAPars
 {
-    partial class Form1
+    partial class PcaPars
     {
         /// <summary>
         /// Обязательная переменная конструктора.
@@ -271,7 +271,7 @@
             this.panel1.Size = new System.Drawing.Size(1382, 419);
             this.panel1.TabIndex = 2;
             // 
-            // Form1
+            // PcaPars
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -281,9 +281,9 @@
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
-            this.Name = "Form1";
-            this.Text = "Form1";
-            this.Load += new System.EventHandler(this.Form1_Load);
+            this.Name = "PcaPars";
+            this.Text = "PcaPars";
+            this.Load += new System.EventHandler(this.PcaPars_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.tableLayoutPanel1.ResumeLayout(false);

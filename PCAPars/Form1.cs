@@ -8,17 +8,17 @@
     /// <summary>
     /// Основное окно формы.
     /// </summary>
-    public partial class Form1 : Form
+    public partial class PcaPars : Form
     {
         /// <summary>
         /// Конструктор.
         /// </summary>
-        public Form1()
+        public PcaPars()
         {
             InitializeComponent();
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void PcaPars_Load(object sender, EventArgs e)
         {
         }
 
