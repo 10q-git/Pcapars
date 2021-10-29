@@ -60,6 +60,15 @@
         }
 
         /// <summary>
+        /// Очистка результата.
+        /// </summary>
+        /// <returns>Dictionary<int, Dictionary<string, string>>.</returns>
+        public static void ClearReturnsItems()
+        {
+            returnsItems = new Dictionary<int, Dictionary<string, string>>();
+        }
+
+        /// <summary>
         /// Геттер для количества обработанных пакетов.
         /// </summary>
         /// <returns>int</returns>
@@ -114,26 +123,29 @@
             /// <param name="packet">Обрабатываемый пакет.</param>
             public void Pars(PcapDotNet.Packets.Packet packet)
             {
-                PcapDotNet.Packets.Transport.TcpDatagram packetTCP = packet.Ethernet.IpV4.Tcp;
-
-                var ip = packet.Ethernet.IpV4;
-                var source = ip.Source.ToString();
-                var destination = ip.Destination.ToString();
-                Dictionary<string, string> infoDic = new Dictionary<string, string>();
-
-                if (packetTCP.IsValid && packetTCP.IsAcknowledgment)
+                if (packet.Ethernet != null && packet.Ethernet.IpV4 != null && packet.Ethernet.IpV4.Tcp != null)
                 {
-                    infoDic.Add("Date", packet.Timestamp.ToString("yyyy-MM-dd hh:mm:ss"));
-                    infoDic.Add("Protocol", "TCP");
-                    infoDic.Add("Length", packetTCP.Length.ToString());
-                    infoDic.Add("Source", source);
-                    infoDic.Add("Destination", destination);
-                    string ack = "; ack=" + packetTCP.AcknowledgmentNumber.ToString();
-                    string seq = ", seq=" + packetTCP.SequenceNumber.ToString();
-                    infoDic.Add("Info", "Sourse Port: " + packetTCP.SourcePort + " -> Destination Port: " + packetTCP.DestinationPort + ack + seq + "\n\n Ethernet: MacSource: " + packet.Ethernet.Source + "      MacDestination:" + packet.Ethernet.Destination);
-                }
+                    PcapDotNet.Packets.Transport.TcpDatagram packetTCP = packet.Ethernet.IpV4.Tcp;
 
-                FileOpen.returnsItems.Add(FileOpen.count++, infoDic);
+                    var ip = packet.Ethernet.IpV4;
+                    var source = ip.Source.ToString();
+                    var destination = ip.Destination.ToString();
+                    Dictionary<string, string> infoDic = new Dictionary<string, string>();
+
+                    if (packetTCP.IsValid && packetTCP.IsAcknowledgment)
+                    {
+                        infoDic.Add("Date", packet.Timestamp.ToString("yyyy-MM-dd hh:mm:ss"));
+                        infoDic.Add("Protocol", "TCP");
+                        infoDic.Add("Length", packetTCP.Length.ToString());
+                        infoDic.Add("Source", source);
+                        infoDic.Add("Destination", destination);
+                        string ack = "; ack=" + packetTCP.AcknowledgmentNumber.ToString();
+                        string seq = ", seq=" + packetTCP.SequenceNumber.ToString();
+                        infoDic.Add("Info", "Sourse Port: " + packetTCP.SourcePort + " -> Destination Port: " + packetTCP.DestinationPort + ack + seq + "\n\n Ethernet: MacSource: " + packet.Ethernet.Source + "      MacDestination:" + packet.Ethernet.Destination);
+                    }
+
+                    FileOpen.returnsItems.Add(FileOpen.count++, infoDic);
+                }
             }
         }
 
@@ -148,22 +160,25 @@
             /// <param name="packet">Обрабатываемый пакет.</param>
             public void Pars(PcapDotNet.Packets.Packet packet)
             {
-                PcapDotNet.Packets.Transport.UdpDatagram packetUDP = packet.Ethernet.IpV4.Udp;
-                var ip = packet.Ethernet.IpV4;
-                var source = ip.Source.ToString();
-                var destination = ip.Destination.ToString();
-                Dictionary<string, string> infoDic = new Dictionary<string, string>();
-                if (packet.Ethernet.IpV4.Transport != null && packet.Ethernet.IpV4.Transport.IsChecksumOptional && packetUDP.Dns.IsValid == false)
+                if (packet.Ethernet != null && packet.Ethernet.IpV4 != null && packet.Ethernet.IpV4.Udp != null)
                 {
-                    infoDic.Add("Date", packet.Timestamp.ToString("yyyy-MM-dd hh:mm:ss"));
-                    infoDic.Add("Protocol", "UDP");
-                    infoDic.Add("Length", packetUDP.TotalLength.ToString());
-                    infoDic.Add("Source", source);
-                    infoDic.Add("Destination", destination);
-                    infoDic.Add("Info", "Sourse Port: " + packetUDP.SourcePort + " -> Destination Port: " + packetUDP.DestinationPort + "\n\n Ethernet: MacSource: " + packet.Ethernet.Source + "      MacDestination:" + packet.Ethernet.Destination);
-                }
+                    PcapDotNet.Packets.Transport.UdpDatagram packetUDP = packet.Ethernet.IpV4.Udp;
+                    var ip = packet.Ethernet.IpV4;
+                    var source = ip.Source.ToString();
+                    var destination = ip.Destination.ToString();
+                    Dictionary<string, string> infoDic = new Dictionary<string, string>();
+                    if (packet.Ethernet.IpV4.Transport != null && packet.Ethernet.IpV4.Transport.IsChecksumOptional && packetUDP.Dns.IsValid == false)
+                    {
+                        infoDic.Add("Date", packet.Timestamp.ToString("yyyy-MM-dd hh:mm:ss"));
+                        infoDic.Add("Protocol", "UDP");
+                        infoDic.Add("Length", packetUDP.TotalLength.ToString());
+                        infoDic.Add("Source", source);
+                        infoDic.Add("Destination", destination);
+                        infoDic.Add("Info", "Sourse Port: " + packetUDP.SourcePort + " -> Destination Port: " + packetUDP.DestinationPort + "\n\n Ethernet: MacSource: " + packet.Ethernet.Source + "      MacDestination:" + packet.Ethernet.Destination);
+                    }
 
-                FileOpen.returnsItems.Add(FileOpen.count++, infoDic);
+                    FileOpen.returnsItems.Add(FileOpen.count++, infoDic);
+                }
             }
         }
 
@@ -178,30 +193,33 @@
             /// <param name="packet">Обрабатываемый пакет.</param>
             public void Pars(PcapDotNet.Packets.Packet packet)
             {
-                PcapDotNet.Packets.Http.HttpDatagram packetHttp = packet.Ethernet.IpV4.Tcp.Http;
-                var ip = packet.Ethernet.IpV4;
-                var source = ip.Source.ToString();
-                var destination = ip.Destination.ToString();
-                Dictionary<string, string> infoDic = new Dictionary<string, string>();
-                if (packetHttp.Header != null)
+                if (packet.Ethernet != null && packet.Ethernet.IpV4 != null && packet.Ethernet.IpV4.Tcp != null && packet.Ethernet.IpV4.Tcp.Http != null)
                 {
-                    infoDic.Add("Date", packet.Timestamp.ToString("yyyy-MM-dd hh:mm:ss"));
-                    infoDic.Add("Protocol", "HTTP");
-                    infoDic.Add("Length", packetHttp.Length.ToString());
-                    infoDic.Add("Source", source);
-                    infoDic.Add("Destination", destination);
-                    if (packetHttp.IsRequest)
+                    PcapDotNet.Packets.Http.HttpDatagram packetHttp = packet.Ethernet.IpV4.Tcp.Http;
+                    var ip = packet.Ethernet.IpV4;
+                    var source = ip.Source.ToString();
+                    var destination = ip.Destination.ToString();
+                    Dictionary<string, string> infoDic = new Dictionary<string, string>();
+                    if (packetHttp.Header != null)
                     {
-                        PcapDotNet.Packets.Http.HttpRequestDatagram packetHttpRequest = (PcapDotNet.Packets.Http.HttpRequestDatagram)packet.Ethernet.IpV4.Tcp.Http;
-                        infoDic.Add("Info", packetHttpRequest.Method.KnownMethod.ToString() + " " + packetHttpRequest.Uri.ToString() + " " + packetHttpRequest.Version.ToString());
-                    }
-                    else
-                    {
-                        PcapDotNet.Packets.Http.HttpResponseDatagram packetHttpResponse = (PcapDotNet.Packets.Http.HttpResponseDatagram)packet.Ethernet.IpV4.Tcp.Http;
-                        infoDic.Add("Info", packetHttpResponse.Version.ToString() + " " + packetHttpResponse.StatusCode.ToString());
-                    }
+                        infoDic.Add("Date", packet.Timestamp.ToString("yyyy-MM-dd hh:mm:ss"));
+                        infoDic.Add("Protocol", "HTTP");
+                        infoDic.Add("Length", packetHttp.Length.ToString());
+                        infoDic.Add("Source", source);
+                        infoDic.Add("Destination", destination);
+                        if (packetHttp.IsRequest)
+                        {
+                            PcapDotNet.Packets.Http.HttpRequestDatagram packetHttpRequest = (PcapDotNet.Packets.Http.HttpRequestDatagram)packet.Ethernet.IpV4.Tcp.Http;
+                            infoDic.Add("Info", packetHttpRequest.Method.KnownMethod.ToString() + " " + packetHttpRequest.Uri.ToString() + " " + packetHttpRequest.Version.ToString() + "\n\n Ethernet: MacSource: " + packet.Ethernet.Source + "      MacDestination:" + packet.Ethernet.Destination);
+                        }
+                        else
+                        {
+                            PcapDotNet.Packets.Http.HttpResponseDatagram packetHttpResponse = (PcapDotNet.Packets.Http.HttpResponseDatagram)packet.Ethernet.IpV4.Tcp.Http;
+                            infoDic.Add("Info", packetHttpResponse.Version.ToString() + " " + packetHttpResponse.StatusCode.ToString() + "\n\n Ethernet: MacSource: " + packet.Ethernet.Source + "      MacDestination:" + packet.Ethernet.Destination);
+                        }
 
-                    FileOpen.returnsItems.Add(FileOpen.count++, infoDic);
+                        FileOpen.returnsItems.Add(FileOpen.count++, infoDic);
+                    }
                 }
             }
         }
@@ -217,22 +235,25 @@
             /// <param name="packet">Обрабатываемый пакет.</param>
             public void Pars(PcapDotNet.Packets.Packet packet)
             {
-                PcapDotNet.Packets.Icmp.IcmpDatagram packetICMP = packet.Ethernet.IpV4.Icmp;
-                var ip = packet.Ethernet.IpV4;
-                var source = ip.Source.ToString();
-                var destination = ip.Destination.ToString();
-                Dictionary<string, string> infoDic = new Dictionary<string, string>();
-                if (packetICMP.IsChecksumCorrect)
+                if (packet.Ethernet != null && packet.Ethernet.IpV4 != null && packet.Ethernet.IpV4.Icmp != null)
                 {
-                    infoDic.Add("Date", packet.Timestamp.ToString("yyyy-MM-dd hh:mm:ss"));
-                    infoDic.Add("Protocol", "ICMP");
-                    infoDic.Add("Length", packetICMP.Length.ToString());
-                    infoDic.Add("Source", source);
-                    infoDic.Add("Destination", destination);
-                    infoDic.Add("Info", packetICMP.MessageTypeAndCode.ToString());
-                }
+                    PcapDotNet.Packets.Icmp.IcmpDatagram packetICMP = packet.Ethernet.IpV4.Icmp;
+                    var ip = packet.Ethernet.IpV4;
+                    var source = ip.Source.ToString();
+                    var destination = ip.Destination.ToString();
+                    Dictionary<string, string> infoDic = new Dictionary<string, string>();
+                    if (packetICMP.IsChecksumCorrect)
+                    {
+                        infoDic.Add("Date", packet.Timestamp.ToString("yyyy-MM-dd hh:mm:ss"));
+                        infoDic.Add("Protocol", "ICMP");
+                        infoDic.Add("Length", packetICMP.Length.ToString());
+                        infoDic.Add("Source", source);
+                        infoDic.Add("Destination", destination);
+                        infoDic.Add("Info", packetICMP.MessageTypeAndCode.ToString() + "\n\n Ethernet: MacSource: " + packet.Ethernet.Source + "      MacDestination:" + packet.Ethernet.Destination);
+                    }
 
-                FileOpen.returnsItems.Add(FileOpen.count++, infoDic);
+                    FileOpen.returnsItems.Add(FileOpen.count++, infoDic);
+                }
             }
         }
 
