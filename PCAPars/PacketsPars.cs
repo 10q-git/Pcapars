@@ -12,7 +12,7 @@
         /// <summary>
         /// Словарь с результатом работы парсеров.
         /// </summary>
-        private static Dictionary<int, Dictionary<string, string>> returnsItems = new Dictionary<int, Dictionary<string, string>>();
+        private static Dictionary<int, Dictionary<string, string>> resultDict = new Dictionary<int, Dictionary<string, string>>();
 
         /// <summary>
         /// Количество обработанных пакетов.
@@ -54,9 +54,9 @@
         /// Геттер для результата работы.
         /// </summary>
         /// <returns>Dictionary<int, Dictionary<string, string>>.</returns>
-        public static Dictionary<int, Dictionary<string, string>> GetReturnsItems()
+        public static Dictionary<int, Dictionary<string, string>> GetResultDict()
         {
-            return returnsItems;
+            return resultDict;
         }
 
         /// <summary>
@@ -65,26 +65,16 @@
         /// <returns>Dictionary<int, Dictionary<string, string>>.</returns>
         public static void ClearReturnsItems()
         {
-            returnsItems = new Dictionary<int, Dictionary<string, string>>();
-        }
-
-        /// <summary>
-        /// Геттер для количества обработанных пакетов.
-        /// </summary>
-        /// <returns>int</returns>
-        public static int GetCount()
-        {
-            return count;
+            resultDict = new Dictionary<int, Dictionary<string, string>>();
         }
 
         /// <summary>
         /// Запуск обработки файла.
         /// </summary>
-        /// <param name="nameFile">Имя файла.</param>
-        public void Open(string nameFile)
+        public void Open()
         {
             // Create the offline device
-            OfflinePacketDevice selectedDevice = new OfflinePacketDevice(nameFile);
+            OfflinePacketDevice selectedDevice = new OfflinePacketDevice(fileName);
 
             // Open the capture file
             using (PacketCommunicator communicator =
@@ -94,6 +84,16 @@
                 IoC.Registration(this.container);
                 communicator.ReceivePackets(0, this.DispatcherHandler);
             }
+
+            for (int i = 1; i < count; i++)
+            {
+                if (resultDict[i].Count == 0)
+                {
+                    resultDict.Remove(i);
+                }
+            }
+
+            count = resultDict.Count;
         }
 
         /// <summary>
@@ -144,7 +144,7 @@
                         infoDic.Add("Info", "Sourse Port: " + packetTCP.SourcePort + " -> Destination Port: " + packetTCP.DestinationPort + ack + seq + "\n\n Ethernet: MacSource: " + packet.Ethernet.Source + "      MacDestination:" + packet.Ethernet.Destination);
                     }
 
-                    FileOpen.returnsItems.Add(FileOpen.count++, infoDic);
+                    FileOpen.resultDict.Add(FileOpen.count++, infoDic);
                 }
             }
         }
@@ -177,7 +177,7 @@
                         infoDic.Add("Info", "Sourse Port: " + packetUDP.SourcePort + " -> Destination Port: " + packetUDP.DestinationPort + "\n\n Ethernet: MacSource: " + packet.Ethernet.Source + "      MacDestination:" + packet.Ethernet.Destination);
                     }
 
-                    FileOpen.returnsItems.Add(FileOpen.count++, infoDic);
+                    FileOpen.resultDict.Add(FileOpen.count++, infoDic);
                 }
             }
         }
@@ -218,7 +218,7 @@
                             infoDic.Add("Info", packetHttpResponse.Version.ToString() + " " + packetHttpResponse.StatusCode.ToString() + "\n\n Ethernet: MacSource: " + packet.Ethernet.Source + "      MacDestination:" + packet.Ethernet.Destination);
                         }
 
-                        FileOpen.returnsItems.Add(FileOpen.count++, infoDic);
+                        FileOpen.resultDict.Add(FileOpen.count++, infoDic);
                     }
                 }
             }
@@ -252,7 +252,7 @@
                         infoDic.Add("Info", packetICMP.MessageTypeAndCode.ToString() + "\n\n Ethernet: MacSource: " + packet.Ethernet.Source + "      MacDestination:" + packet.Ethernet.Destination);
                     }
 
-                    FileOpen.returnsItems.Add(FileOpen.count++, infoDic);
+                    FileOpen.resultDict.Add(FileOpen.count++, infoDic);
                 }
             }
         }

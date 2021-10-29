@@ -3,6 +3,8 @@
     using System;
     using System.Collections.Generic;
     using System.Windows.Forms;
+    using LoggerNS;
+    using NLog;
     using PacketsPars;
 
     /// <summary>
@@ -41,42 +43,48 @@
 
             FileOpen.ClearReturnsItems();
 
-            FileOpen file = new FileOpen(fileName);
-            file.Open(fileName);
+            try
+            {
+                FileOpen file = new FileOpen(fileName);
+                file.Open();
+            }
+            catch
+            {
+                LoggerNS.Logger.ErrorOpenFileLogger(fileName);
+            }
        
-            Dictionary<int, Dictionary<string, string>> returnsItems = new Dictionary<int, Dictionary<string, string>>();
+            Dictionary<int, Dictionary<string, string>> resultDict = new Dictionary<int, Dictionary<string, string>>();
 
-            returnsItems = FileOpen.GetReturnsItems();
+            resultDict = FileOpen.GetResultDict();
 
             int num = 1;
-            int iterationCount = FileOpen.GetCount();
 
-            for (int i = 1; i <= iterationCount - 1; i++)
+            foreach (int key in resultDict.Keys)
             {           
                 try
                 {
-                    Dictionary<string, string> thisItem = returnsItems[i];
+                    Dictionary<string, string> thisItem = resultDict[key];
 
                     Label number = LabelCreation.CreateNumberLabel();
                     number.Text = num.ToString();
 
                     Label time = LabelCreation.CreateTimeLabel();
-                    time.Text = returnsItems[i]["Date"];
+                    time.Text = resultDict[key]["Date"];
 
                     Label source = LabelCreation.CreateSourceLabel();
-                    source.Text = returnsItems[i]["Source"];
+                    source.Text = resultDict[key]["Source"];
 
                     Label destination = LabelCreation.CreateDestinationLabel();
-                    destination.Text = returnsItems[i]["Destination"];
+                    destination.Text = resultDict[key]["Destination"];
 
                     Label protocol = LabelCreation.CreateProtocolLabel();
-                    protocol.Text = returnsItems[i]["Protocol"];
+                    protocol.Text = resultDict[key]["Protocol"];
 
                     Label length = LabelCreation.CreateLengthLabel();
-                    length.Text = returnsItems[i]["Length"];
+                    length.Text = resultDict[key]["Length"];
 
                     Label info = LabelCreation.CreateInfoLabel();
-                    info.Text = returnsItems[i]["Info"];
+                    info.Text = resultDict[key]["Info"];
 
                     tableLayoutPanel1.RowCount++;
                     tableLayoutPanel1.Controls.Add(number);   
